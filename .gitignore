@@ -1,6 +1,6 @@
 # Ignora as pastas dos microsserviços para que eles tenham seus próprios repositórios isolados
-/chef-manager-api/
-/chef-payment-service/
+#/chef-manager-api/
+#/chef-payment-service/
 
 # Ignora variáveis de ambiente sensíveis locais
 .env
