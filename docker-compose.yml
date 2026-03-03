@@ -1,0 +1,150 @@
+services:
+  # Serviço do Banco de Dados PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432" # Expõe a porta do Postgres para o seu PC
+    networks:
+      - app-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # Persiste os dados do banco
+    healthcheck: # Verifica se o banco de dados está pronto para conexões
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Serviço da Aplicação Spring
+  app:
+    build: ./chef-manager-api # Constrói a imagem a partir do Dockerfile no diretório atual
+    container_name: chef-manager-api
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+# Serviço banco de dados PostgreSQL para o SonarQube
+  sonar-db:
+    image: postgres:16-alpine
+    container_name: sonar_db
+    environment:
+      POSTGRES_USER: ${DB_SONAR_USER}
+      POSTGRES_PASSWORD: ${DB_SONAR_PASSWORD}
+      POSTGRES_DB: ${DB_SONAR_NAME}
+    networks:
+      - app-network
+    volumes:
+      - sonar-db-data:/var/lib/postgresql/data
+    healthcheck: # Verifica se o banco de dados está pronto para conexões
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_SONAR_USER} -d ${DB_SONAR_NAME}" ]
+      interval: 5s
+      timeout: 5s
+
+# Serviço do SonarQube
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    depends_on:
+      sonar-db:
+        condition: service_healthy
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://sonar-db:5432/${DB_SONAR_NAME}
+      - SONAR_JDBC_USERNAME=${DB_SONAR_USER}
+      - SONAR_JDBC_PASSWORD=${DB_SONAR_PASSWORD}
+    networks:
+      - app-network
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
+# Serviço do Kafka (O Broker de Mensageria)
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - app-network
+
+# Serviço de Pagamentos (Quarkus)
+  pagamentos:
+    build: ./chef-payment-service
+    container_name: chef-payment-service
+#      dockerfile: src/main/docker/Dockerfile # Usando a versão JVM. Outras versões podem ser usadas
+    ports:
+      - "8082:8080" # O Quarkus roda internamente na 8080, mapeamos para 8082 para não conflitar com a API principal
+    environment:
+      # Apontando para o Kafka usando o nome do contêiner e a porta interna
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://pagamentos-db:5432/${DB_PAGAMENTOS_NAME}
+      - QUARKUS_DATASOURCE_USERNAME=${DB_PAGAMENTOS_USER}
+      - QUARKUS_DATASOURCE_PASSWORD=${DB_PAGAMENTOS_PASSWORD}
+    depends_on:
+      pagamentos-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # Serviço banco de dados PostgreSQL para o serviço de pagamento
+  pagamentos-db:
+    image: postgres:16-alpine
+    container_name: pagamentos_db
+    environment:
+      POSTGRES_USER: ${DB_PAGAMENTOS_USER}
+      POSTGRES_PASSWORD: ${DB_PAGAMENTOS_PASSWORD}
+      POSTGRES_DB: ${DB_PAGAMENTOS_NAME}
+    networks:
+      - app-network
+    volumes:
+      - pagamentos-db-data:/var/lib/postgresql/data
+    healthcheck: # Verifica se o banco de dados está pronto para conexões
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_PAGAMENTOS_USER} -d ${DB_PAGAMENTOS_NAME}" ]
+      interval: 5s
+      timeout: 5s
+
+  gateway-pagamento:
+    image: docker.io/erickemprobr/procpag:latest
+    platform: linux/amd64
+    ports:
+      - "8089:8089"
+    networks:
+      - app-network
+
+# Declaração dos volumes e redes
+volumes:
+  postgres-data:        # Volume nomeado para persistir os dados
+  sonar-db-data:        # Volume nomeado para o banco de dados do SonarQube
+  sonarqube_data:       # Volume para dados do SonarQube
+  sonarqube_extensions: # Volume para extensões do SonarQube
+  sonarqube_logs:       # Volume para logs do SonarQube
+  kafka-data:           # Volume para persistir dados do Kafka
+  pagamentos-db-data:   # Volume para o banco de dados de pagamentos
+
+networks:
+  app-network: # Rede customizada para os serviços se comunicarem
