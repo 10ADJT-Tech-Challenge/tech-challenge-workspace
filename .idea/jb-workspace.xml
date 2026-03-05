@@ -2,10 +2,10 @@
 <project version="4">
   <component name="WorkspaceSettings">
     <project name="chef-manager-api" path="$PROJECT_DIR$/chef-manager-api">
-      <vcs id="Git" remoteUrl="git@github.com:10ADJT-Tech-Challenge/chef-manager-api.git" />
+      <vcs id="Git" remoteUrl="https://github.com/10ADJT-Tech-Challenge/chef-manager-api" />
     </project>
     <project name="chef-payment-service" path="$PROJECT_DIR$/chef-payment-service">
-      <vcs id="Git" remoteUrl="git@github.com:10ADJT-Tech-Challenge/chef-payment-service.git" />
+      <vcs id="Git" remoteUrl="https://github.com/10ADJT-Tech-Challenge/chef-payment-service" />
     </project>
     <option name="workspace" value="true" />
   </component>

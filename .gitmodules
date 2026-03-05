@@ -1,6 +1,6 @@
 [submodule "chef-payment-service"]
 	path = chef-payment-service
-	url = git@github.com:10ADJT-Tech-Challenge/chef-payment-service.git
+	url = https://github.com/10ADJT-Tech-Challenge/chef-payment-service
 [submodule "chef-manager-api"]
 	path = chef-manager-api
 	url = https://github.com/10ADJT-Tech-Challenge/chef-manager-api
