@@ -7,9 +7,6 @@
     <project name="chef-payment-service" path="$PROJECT_DIR$/chef-payment-service">
       <vcs id="Git" remoteUrl="https://github.com/10ADJT-Tech-Challenge/chef-payment-service" />
     </project>
-    <project name="auth-service" path="$PROJECT_DIR$/auth-service">
-      <vcs id="Git" remoteUrl="https://github.com/10ADJT-Tech-Challenge/auth-service.git" />
-    </project>
     <option name="workspace" value="true" />
   </component>
 </project>
