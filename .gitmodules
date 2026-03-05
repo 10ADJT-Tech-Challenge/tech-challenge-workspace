@@ -4,6 +4,3 @@
 [submodule "chef-manager-api"]
 	path = chef-manager-api
 	url = https://github.com/10ADJT-Tech-Challenge/chef-manager-api
-[submodule "auth-service"]
-	path = auth-service
-	url = https://github.com/10ADJT-Tech-Challenge/auth-service.git
