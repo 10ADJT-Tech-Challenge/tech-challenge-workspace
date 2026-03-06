@@ -102,6 +102,9 @@ services:
       DB_NAME: ${DB_PAGAMENTOS_NAME}
       DB_USER: ${DB_PAGAMENTOS_USER}
       DB_PASSWORD: ${DB_PAGAMENTOS_PASSWORD}
+      PAGAMENTO_EXTERNO_URL: gateway-pagamento
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
       # Apontando para o Kafka usando o nome do contêiner e a porta interna
 #      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 #      - QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://pagamentos-db:5432/${DB_PAGAMENTOS_NAME}
@@ -124,7 +127,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PAGAMENTOS_PASSWORD}
       POSTGRES_DB: ${DB_PAGAMENTOS_NAME}
     ports:
-      - "5432:5433"
+      - "5433:5432"
     networks:
       - app-network
     volumes:
