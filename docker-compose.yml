@@ -178,6 +178,49 @@ services:
     networks:
       - app-network
 
+# Serviço de Pedidos
+  pedidos:
+    build:
+      context: ./chef-order-service
+    container_name: chef-order-service
+    ports:
+      - "8081:8080"
+    environment:
+      DB_HOST: pedidos-db
+      DB_NAME: ${DB_PEDIDOS_NAME}
+      DB_USER: ${DB_PEDIDOS_USER}
+      DB_PASSWORD: ${DB_PEDIDOS_PASSWORD}
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 29092
+    depends_on:
+      pedidos-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init-topics:
+        condition: service_completed_successfully
+    networks:
+      - app-network
+
+# Serviço banco de dados PostgreSQL para o serviço de pedidos
+  pedidos-db:
+    image: postgres:16-alpine
+    container_name: pedidos_db
+    environment:
+      POSTGRES_USER: ${DB_PEDIDOS_USER}
+      POSTGRES_PASSWORD: ${DB_PEDIDOS_PASSWORD}
+      POSTGRES_DB: ${DB_PEDIDOS_NAME}
+    ports:
+      - "5434:5432"
+    networks:
+      - app-network
+    volumes:
+      - pedidos-db-data:/var/lib/postgresql/data
+    healthcheck: # Verifica se o banco de dados está pronto para conexões
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_PEDIDOS_USER} -d ${DB_PEDIDOS_NAME}" ]
+      interval: 5s
+      retries: 5
+
 # Declaração dos volumes e redes
 volumes:
   postgres-data:        # Volume nomeado para persistir os dados
@@ -187,6 +230,7 @@ volumes:
   sonarqube_logs:       # Volume para logs do SonarQube
   kafka-data:           # Volume para persistir dados do Kafka
   pagamentos-db-data:   # Volume para o banco de dados de pagamentos
+  pedidos-db-data:      # Volume para o banco de dados de pedidos
 
 networks:
   app-network: # Rede customizada para os serviços se comunicarem

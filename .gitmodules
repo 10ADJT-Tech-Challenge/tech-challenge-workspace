@@ -4,3 +4,6 @@
 [submodule "chef-manager-api"]
 	path = chef-manager-api
 	url = https://github.com/10ADJT-Tech-Challenge/chef-manager-api
+[submodule "chef-order-service"]
+	path = chef-order-service
+	url = https://github.com/10ADJT-Tech-Challenge/chef-order-service.git
