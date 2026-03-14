@@ -1,0 +1,74 @@
+@startuml
+title Arquitetura de Componentes - Plataforma de Pedidos
+
+left to right direction
+skinparam componentStyle rectangle
+
+actor Cliente
+
+' =========================
+' Identity
+' =========================
+package "Identity" {
+  component "ChefManagerApi\n(Token Issuer)" as Auth
+}
+
+' =========================
+' Pedidos
+' =========================
+package "Pedidos" {
+  component "ChefOrdersApi\n(JWT Validation)" as Orders
+}
+
+' =========================
+' Event Streaming
+' =========================
+package "Kafka Event Streaming" {
+  queue "pedido.criado" as PedidoCriado
+  queue "pagamento.pendente" as PagamentoPendente
+  queue "pagamento.aprovado" as PagamentoAprovado
+}
+
+' =========================
+' Pagamento
+' =========================
+package "Pagamento" {
+  component "ChefPaymentService\n(Quarkus)" as Payment
+  database "PostgreSQL\nPagamentos" as PaymentDB
+}
+
+' =========================
+' Sistemas externos
+' =========================
+package "External Systems" {
+  component "Gateway de Pagamento" as Gateway
+}
+
+' =========================
+' Fluxos
+' =========================
+
+Cliente --> Auth : Login
+Auth --> Cliente : JWT assinado
+
+Cliente --> Orders : Criar pedido\nBearer JWT
+
+note right of Orders
+Validação local do JWT
+usando chave pública
+(configuração)
+end note
+
+Orders --> PedidoCriado : Publica evento
+
+PedidoCriado --> Payment : Consumidor
+
+Payment --> Gateway : Processar pagamento
+Payment --> PaymentDB : Persistir status
+
+Payment --> PagamentoPendente : Evento
+Payment --> PagamentoAprovado : Evento
+
+PagamentoPendente --> Orders : Atualiza pedido
+PagamentoAprovado --> Orders : Atualiza pedido
+@enduml
