@@ -68,7 +68,7 @@ Orders --> OrderDB : Persistir pedidos
 PedidoCriado --> Payment : Consumidor
 
 Payment --> Gateway : Processar pagamento
-Payment --> PaymentDB : Persistir status
+Payment --> PaymentDB : Persistir pagamentos
 
 Payment --> PagamentoPendente : Evento
 Payment --> PagamentoAprovado : Evento
