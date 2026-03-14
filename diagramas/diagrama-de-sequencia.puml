@@ -1,0 +1,88 @@
+
+@startuml
+title Fluxo Completo: Autenticação, Pedido e Reprocessamento Resiliente
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Cliente" as User
+participant "ChefManagerApi\n(Auth/IdP)" as Auth
+participant "ChefOrdersApi\n(Pedidos)" as Order
+queue "Kafka: pedido.criado" as TopicCreated
+participant "ChefPaymentService\n(Quarkus)" as Payment
+participant "Gateway Externo" as Gateway
+queue "Kafka: pagamento.pendente" as TopicPending
+queue "Kafka: pagamento.aprovado" as TopicApproved
+
+== 1. Autenticação e Autorização ==
+User -> Auth: POST /login (Credenciais)
+Auth --> User: 200 OK (JWT Assinado - Chave Assimétrica)
+
+== 2. Criação do Pedido ==
+User -> Order: POST /pedidos (JWT + Payload)
+activate Order
+Order -> Order: Validação Local do JWT (Public Key)
+Order -> Order: Salvar Pedido (Status: AGUARDANDO_PAGAMENTO)
+Order -> TopicCreated: Publicar "pedido.criado"
+Order --> User: 201 Created (ID do Pedido)
+deactivate Order
+
+== 3. Processamento Inicial com Fallback ==
+TopicCreated -> Payment: Consumir evento "pedido.criado"
+activate Payment
+Payment -> Payment: Criar Entidade de Domínio (Status: PENDENTE)
+
+group Estratégia de Resiliência (SmallRye Fault Tolerance)
+    Payment -> Gateway: Chamada REST (Timeout 1s, Retry 2x)
+    
+    alt Gateway Indisponível (Circuit Breaker Aberto / Timeout)
+        Gateway --X Payment: Falha ou Latência
+        Payment -> Payment: Executar @Fallback
+        Payment -> TopicPending: Publicar "pagamento.pendente"
+        note right of Payment: Persiste no PostgreSQL como PENDENTE
+    else Sucesso Imediato
+        Gateway --> Payment: 201 CREATED
+        Payment -> TopicApproved: Publicar "pagamento.aprovado"
+        note right of Payment: Persiste no PostgreSQL como APROVADO
+    end
+end
+deactivate Payment
+
+== 4. Atualização de status pendente ==
+
+TopicPending -> Order: Consumir "pagamento.pendente"
+activate Order
+Order -> Order: Atualizar Status do Pedido (PENDENTE_PAGAMENTO)
+deactivate Order
+
+== 5. Ciclo de Reprocessamento (Auto-recuperação) ==
+note over Payment, TopicPending: O serviço consome a própria fila de pendência
+
+TopicPending -> Payment: Consumir "pagamento.pendente"
+activate Payment
+group Estratégia de Resiliência (SmallRye Fault Tolerance)
+    Payment -> Gateway: Nova Tentativa Chamada REST (Timeout 1s, Retry 2x)
+    
+    alt Gateway Indisponível (Circuit Breaker Aberto / Timeout)
+        Gateway --X Payment: Falha ou Latência
+        Payment -> Payment: Executar @Fallback
+        Payment -> TopicPending: Publicar "pagamento.pendente"
+        note right of Payment: Persiste no PostgreSQL como PENDENTE
+    else Sucesso Imediato
+        Gateway --> Payment: 201 CREATED
+        Payment -> TopicApproved: Publicar "pagamento.aprovado"
+        note right of Payment: Persiste no PostgreSQL como APROVADO
+    end
+end
+deactivate Payment
+
+
+== 6. Finalização do Fluxo ==
+
+TopicApproved -> Order: Consumir "pagamento.aprovado"
+activate Order
+Order -> Order: Atualizar Status do Pedido (PAGO)
+deactivate Order
+
+@enduml
