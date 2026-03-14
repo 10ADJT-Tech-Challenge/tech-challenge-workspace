@@ -11,6 +11,7 @@ actor Cliente
 ' =========================
 package "Identity" {
   component "ChefManagerApi\n(Token Issuer)" as Auth
+  database "PostgreSQL\nManager" as ManagerDB
 }
 
 ' =========================
@@ -18,6 +19,7 @@ package "Identity" {
 ' =========================
 package "Pedidos" {
   component "ChefOrdersApi\n(JWT Validation)" as Orders
+  database "PostgreSQL\nPedidos" as OrderDB
 }
 
 ' =========================
@@ -50,6 +52,7 @@ package "External Systems" {
 
 Cliente --> Auth : Login
 Auth --> Cliente : JWT assinado
+Auth --> ManagerDB : Persistir usuários
 
 Cliente --> Orders : Criar pedido\nBearer JWT
 
@@ -60,6 +63,7 @@ usando chave pública
 end note
 
 Orders --> PedidoCriado : Publica evento
+Orders --> OrderDB : Persistir pedidos
 
 PedidoCriado --> Payment : Consumidor
 
