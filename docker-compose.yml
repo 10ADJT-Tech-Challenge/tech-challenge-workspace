@@ -82,8 +82,8 @@ services:
       KAFKA_NODE_ID: 1                                                                                   # ID único do nó no cluster Kafka
       KAFKA_PROCESS_ROLES: broker,controller                                                             # Este processo atua como broker (mensagens) e controller (metadados do cluster)
 
-      KAFKA_LISTENERS: CONTROLLER://kafka:9093,INTERNAL://kafka:29092,EXTERNAL://kafka:9092              # Interfaces e portas onde o Kafka escuta conexões
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://kafka:9092                           # Endereços que o Kafka anuncia para clientes se conectarem
+      KAFKA_LISTENERS: CONTROLLER://kafka:9093,INTERNAL://kafka:29092,EXTERNAL://0.0.0.0:9092              # Interfaces e portas onde o Kafka escuta conexões
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092                           # Endereços que o Kafka anuncia para clientes se conectarem
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL                                                         # Listener usado para comunicação entre brokers
 
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093                                                       # Define os controllers do cluster (nodeId@endereco:porta)
