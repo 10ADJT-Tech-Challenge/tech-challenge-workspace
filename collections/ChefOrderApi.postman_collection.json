@@ -1,0 +1,404 @@
+{
+  "info": {
+    "_postman_id": "b73e4ece-40cd-4da7-b419-b1ac1458c896",
+    "name": "ChefOrderApi",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12350835",
+    "_collection_link": "https://go.postman.co/collection/12350835-b73e4ece-40cd-4da7-b419-b1ac1458c896?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "pedidos",
+      "item": [
+        {
+          "name": "Cria pedido",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const suffix = Date.now();\r",
+                  "const numeroAleatorio = Math.floor(Math.random() * 5) + 1;\r",
+                  "pm.collectionVariables.set(\"temp_item_quantidade\", numeroAleatorio);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. 201 Created\r",
+                  "pm.test(\"Status code é 201 (Created)\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"pedidoId\", response.id);\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restauranteId\": \"{{restaurante_Id}}\",\n  \"usuarioId\": \"{{usuario_Id}}\",\n  \"itens\": [\n    {\n      \"itemCardapioId\": \"{{itemCardapio_Id}}\",\n      \"descricao\": \"{{item_nome}}\",\n      \"preco\": {{item_preco}},\n      \"quantidade\": {{temp_item_quantidade}}\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseOrderUrl}}/pedidos",
+              "host": [
+                "{{baseOrderUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Item criado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nome\": \"string\",\n  \"preco\": 7572.392977499078,\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": true,\n  \"descricao\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/itens-cardapio/:idRestaurante",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "itens-cardapio",
+                    ":idRestaurante"
+                  ],
+                  "variable": [
+                    {
+                      "key": "idRestaurante",
+                      "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": null
+            }
+          ]
+        },
+        {
+          "name": "Busca pedido",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. 201 Created\r",
+                  "pm.test(\"Status code é 200 (Ok)\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseOrderUrl}}/pedidos/{{pedidoId}}",
+              "host": [
+                "{{baseOrderUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Item criado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nome\": \"string\",\n  \"preco\": 7572.392977499078,\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": true,\n  \"descricao\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/itens-cardapio/:idRestaurante",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "itens-cardapio",
+                    ":idRestaurante"
+                  ],
+                  "variable": [
+                    {
+                      "key": "idRestaurante",
+                      "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": null
+            }
+          ]
+        },
+        {
+          "name": "Busca pedidos do usuário",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. 201 Created\r",
+                  "pm.test(\"Status code é 200 (Ok)\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseOrderUrl}}/pedidos/do-usuario",
+              "host": [
+                "{{baseOrderUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "do-usuario"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Item criado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nome\": \"string\",\n  \"preco\": 7572.392977499078,\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": true,\n  \"descricao\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/itens-cardapio/:idRestaurante",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "itens-cardapio",
+                    ":idRestaurante"
+                  ],
+                  "variable": [
+                    {
+                      "key": "idRestaurante",
+                      "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "temp_item_nome",
+      "value": ""
+    },
+    {
+      "key": "temp_item_preco",
+      "value": ""
+    },
+    {
+      "key": "itemCardapioId",
+      "value": ""
+    },
+    {
+      "key": "temp_item_quantidade",
+      "value": ""
+    },
+    {
+      "key": "pedidoId",
+      "value": ""
+    }
+  ]
+}

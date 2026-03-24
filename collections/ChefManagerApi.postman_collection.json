@@ -1,0 +1,3324 @@
+{
+  "info": {
+    "_postman_id": "a7361e01-5842-41ff-8dff-92fd9027ee36",
+    "name": "ChefManagerApi",
+    "description": "API para o Tech Challenge da Fase 2 - Pós Tech.\n\nEste serviço gerencia o cadastro usuários, tipos de usuários do sistema, restaurantes e  seus cardápios.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12350835",
+    "_collection_link": "https://go.postman.co/collection/12350835-a7361e01-5842-41ff-8dff-92fd9027ee36?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "itens-cardapio",
+      "item": [
+        {
+          "name": "{idRestaurante}",
+          "item": [
+            {
+              "name": "Lista itens de cardápio do restaurante",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "\r",
+                      "// 1. Status 200\r",
+                      "pm.test(\"Status code é 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "// 2. Resposta é array\r",
+                      "pm.test(\"A resposta deve ser uma lista (array)\", function () {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.be.an('array');\r",
+                      "});\r",
+                      "\r",
+                      "// 3. Estrutura de item\r",
+                      "pm.test(\"Cada item possui campos obrigatórios\", function () {\r",
+                      "    const json = pm.response.json();\r",
+                      "    if (json.length > 0) {\r",
+                      "        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\r",
+                      "        json.forEach((item) => {\r",
+                      "            pm.expect(item).to.have.property('id');\r",
+                      "            pm.expect(item).to.have.property('nome');\r",
+                      "            pm.expect(item).to.have.property('preco');\r",
+                      "            pm.expect(item).to.have.property('consumoLocal');\r",
+                      "            pm.expect(item).to.have.property('restauranteId');\r",
+                      "            pm.expect(item.restauranteId).to.eql(pm.collectionVariables.get('restauranteId'));\r",
+                      "            pm.expect(item.id).to.match(uuidRegex);\r",
+                      "        });\r",
+                      "    }\r",
+                      "});\r",
+                      "\r",
+                      "// 4. Integração: item criado anterior aparece?\r",
+                      "pm.test(\"Item criado anteriormente (se existir) aparece na listagem\", function () {\r",
+                      "    const json = pm.response.json();\r",
+                      "    const createdId = pm.collectionVariables.get(\"itemCardapioId\");\r",
+                      "    if (createdId) {\r",
+                      "        const found = json.find(x => x.id === createdId);\r",
+                      "        pm.expect(found, \"Item criado não encontrado na listagem\").to.not.be.undefined;\r",
+                      "    }\r",
+                      "});\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes/{{restauranteId}}/itens-cardapio",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes",
+                    "{{restauranteId}}",
+                    "itens-cardapio"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Lista retornada",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/itens-cardapio/:idRestaurante",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "itens-cardapio",
+                        ":idRestaurante"
+                      ],
+                      "variable": [
+                        {
+                          "key": "idRestaurante",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "[\n  {\n    \"caminhoFoto\": \"string\",\n    \"consumoLocal\": true,\n    \"descricao\": \"string\",\n    \"id\": \"ba8b7603-8d98-7d52-71d7-984c6a825c0f\",\n    \"idRestaurante\": \"22e00709-7283-d6d0-e61a-d56cc1d1eca8\",\n    \"nome\": \"string\",\n    \"preco\": 4602.935526025074\n  },\n  {\n    \"caminhoFoto\": \"string\",\n    \"consumoLocal\": false,\n    \"descricao\": \"string\",\n    \"id\": \"59f949a8-3d47-27da-f365-e389b083ea56\",\n    \"idRestaurante\": \"21fa5a36-d1a1-bca4-7b39-471b058108d4\",\n    \"nome\": \"string\",\n    \"preco\": 3469.580437160702\n  }\n]"
+                }
+              ]
+            },
+            {
+              "name": "Cria item de cardápio",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "const suffix = Date.now();\r",
+                      "pm.collectionVariables.set(\"temp_item_nome\", `Tofu grelhado ${suffix}`);\r",
+                      "pm.environment.set(\"item_nome\", `Tofu grelhado ${suffix}`);\r",
+                      "\r",
+                      "pm.collectionVariables.set(\"temp_item_preco\", \"29.90\");\r",
+                      "pm.environment.set(\"item_preco\", \"29.90\");\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "// 1. 201 Created\r",
+                      "pm.test(\"Status code é 201 (Created)\", function () {\r",
+                      "    pm.response.to.have.status(201);\r",
+                      "});\r",
+                      "\r",
+                      "const res = pm.response.json();\r",
+                      "\r",
+                      "// 2. Guarda ID do item para GET/PUT/DELETE\r",
+                      "pm.collectionVariables.set(\"itemCardapioId\", res.id);\r",
+                      "pm.environment.set(\"itemCardapio_Id\", res.id);\r",
+                      "\r",
+                      "// 3. Valida estrutura básica\r",
+                      "pm.test(\"Resposta possui estrutura do item de cardápio\", function () {\r",
+                      "    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\r",
+                      "    pm.expect(res).to.have.property('id');\r",
+                      "    pm.expect(res.id).to.match(uuidRegex);\r",
+                      "    pm.expect(res).to.have.property('nome', pm.collectionVariables.get(\"temp_item_nome\"));\r",
+                      "    pm.expect(res).to.have.property('preco');\r",
+                      "    pm.expect(res).to.have.property('consumoLocal', true);\r",
+                      "    pm.expect(res).to.have.property('restauranteId', pm.collectionVariables.get(\"restauranteId\"));\r",
+                      "});\r",
+                      "\r",
+                      "// 4. Preço com 2 casas\r",
+                      "// pm.test(\"Preço possui 2 casas decimais\", function () {\r",
+                      "//     const preco = res.preco;\r",
+                      "//     const twoDecimalRegex = /^\\d+(\\.\\d{2})$/;\r",
+                      "//     pm.expect(String(preco)).to.match(twoDecimalRegex);\r",
+                      "// });\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nome\": \"{{temp_item_nome}}\",\n  \"descricao\": \"Item gerado pelo Postman\",\n  \"preco\": {{temp_item_preco}},\n  \"consumoLocal\": true,\n  \"caminhoFoto\": \"/imagens/cardapio/{{temp_item_nome}}.jpg\"\n}\n",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes/{{restauranteId}}/itens-cardapio",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes",
+                    "{{restauranteId}}",
+                    "itens-cardapio"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Item criado",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nome\": \"string\",\n  \"preco\": 7572.392977499078,\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": true,\n  \"descricao\": \"string\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/itens-cardapio/:idRestaurante",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "itens-cardapio",
+                        ":idRestaurante"
+                      ],
+                      "variable": [
+                        {
+                          "key": "idRestaurante",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            },
+            {
+              "name": "Lista itens de cardápio do restaurante por nome",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Busca por parte do nome criado\r",
+                      "const base = pm.collectionVariables.get(\"temp_item_nome\") || \"Tofu\";\r",
+                      "pm.collectionVariables.set(\"temp_item_nome_busca\", base.split(\" \")[0]); // pega primeira palavra\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "\r",
+                      "// 1. 200\r",
+                      "pm.test(\"Status code é 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "const lista = pm.response.json();\r",
+                      "\r",
+                      "// 2. Array\r",
+                      "pm.test(\"Resposta é lista\", function () {\r",
+                      "    pm.expect(lista).to.be.an('array');\r",
+                      "});\r",
+                      "\r",
+                      "// 3. Pelo menos um item corresponde ao termo\r",
+                      "pm.test(\"Pelo menos um item contém o termo buscado\", function () {\r",
+                      "    const termo = (pm.collectionVariables.get(\"temp_item_nome_busca\") || \"\").toLowerCase();\r",
+                      "    const found = lista.some(i => (i.nome || \"\").toLowerCase().includes(termo));\r",
+                      "    pm.expect(found, `Nenhum item contém o termo '${termo}'`).to.be.true;\r",
+                      "});\r",
+                      "\r",
+                      "// 4. O item criado está presente?\r",
+                      "pm.test(\"Item criado aparece na busca por nome\", function () {\r",
+                      "    const idCriado = pm.collectionVariables.get(\"itemCardapioId\");\r",
+                      "    if (idCriado) {\r",
+                      "        const found = lista.find(i => i.id === idCriado);\r",
+                      "        pm.expect(found, \"Item criado não apareceu na busca por nome\").to.not.be.undefined;\r",
+                      "    }\r",
+                      "});\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes/{{restauranteId}}/itens-cardapio?nome={{temp_item_nome_busca}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes",
+                    "{{restauranteId}}",
+                    "itens-cardapio"
+                  ],
+                  "query": [
+                    {
+                      "key": "nome",
+                      "value": "{{temp_item_nome_busca}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "{id}",
+          "item": [
+            {
+              "name": "Remove item de cardápio por ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "\r",
+                      "// 1. 204 (ou 200) ao deletar\r",
+                      "pm.test(\"Status code de delete é 204/200\", function () {\r",
+                      "    pm.expect([200, 204]).to.include(pm.response.code);\r",
+                      "});\r",
+                      "\r",
+                      "// 2. Limpa variável de item (para evitar reuso acidental)\r",
+                      "pm.collectionVariables.unset(\"itemCardapioId\");\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/itens-cardapio/{{itemCardapioId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "itens-cardapio",
+                    "{{itemCardapioId}}"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Item de cardápio deletado com sucesso",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/itens-cardapio/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "itens-cardapio",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            },
+            {
+              "name": "Consulta item por ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "\r",
+                      "// 1. 200\r",
+                      "pm.test(\"Status code é 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "const item = pm.response.json();\r",
+                      "\r",
+                      "// 2. Estrutura e integridade\r",
+                      "pm.test(\"Estrutura e integridade do item\", function () {\r",
+                      "    pm.expect(item).to.have.property('id', pm.collectionVariables.get(\"itemCardapioId\"));\r",
+                      "    pm.expect(item).to.have.property('nome');\r",
+                      "    pm.expect(item).to.have.property('preco');\r",
+                      "    pm.expect(item).to.have.property('consumoLocal');\r",
+                      "    pm.expect(item).to.have.property('restauranteId', pm.collectionVariables.get(\"restauranteId\"));\r",
+                      "});\r",
+                      "\r",
+                      "// 3. Nome confere com o que foi criado\r",
+                      "pm.test(\"Nome do item confere com o criado\", function () {\r",
+                      "    const esperado = pm.collectionVariables.get(\"temp_item_nome\");\r",
+                      "    if (esperado) {\r",
+                      "        pm.expect(item.nome).to.eql(esperado);\r",
+                      "    }\r",
+                      "});\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/itens-cardapio/{{itemCardapioId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "itens-cardapio",
+                    "{{itemCardapioId}}"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Item de cardápio localizado com sucesso",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/itens-cardapio/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "itens-cardapio",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071",
+                          "description": "Identificador único do recurso"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": true,\n  \"descricao\": \"string\",\n  \"id\": \"80b6cbed-2e2e-7c91-1b7e-2dbeb8887446\",\n  \"idRestaurante\": \"03451492-4a63-b049-eea1-1ccaf2365193\",\n  \"nome\": \"string\",\n  \"preco\": 8071.038787549358,\n  \"dataUltimaAlteracao\": \"1991-05-12T21:26:15.730Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Atualiza item de cardápio",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "\r",
+                      "// Gera novo preço e reutiliza base do nome\r",
+                      "pm.collectionVariables.set(\"temp_item_preco_atualizado\", \"34.50\");\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "\r",
+                      "// 1. 200 (ou 204 dependendo da sua API)\r",
+                      "pm.test(\"Status code de atualização é 200/204\", function () {\r",
+                      "    pm.expect([200, 204]).to.include(pm.response.code);\r",
+                      "});\r",
+                      "\r",
+                      "// Caso sua API retorne o recurso atualizado no body:\r",
+                      "// if (pm.response.code === 200) {\r",
+                      "//     const res = pm.response.json();\r",
+                      "\r",
+                      "//     pm.test(\"Campos atualizados conferem\", function () {\r",
+                      "//         pm.expect(res.nome).to.eql(pm.collectionVariables.get(\"temp_item_nome\") + \" (atualizado)\");\r",
+                      "//         pm.expect(String(res.preco)).to.eql(String(pm.collectionVariables.get(\"temp_item_preco_atualizado\")));\r",
+                      "//         pm.expect(res.consumoLocal).to.be.false;\r",
+                      "//         pm.expect(res.restauranteId).to.eql(pm.collectionVariables.get(\"restauranteId\"));\r",
+                      "//     });\r",
+                      "\r",
+                      "//     pm.test(\"Preço possui 2 casas decimais\", function () {\r",
+                      "//         pm.expect(String(res.preco)).to.match(/^\\d+(\\.\\d{2})$/);\r",
+                      "//     });\r",
+                      "// }\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n{\n  \"nome\": \"{{temp_item_nome}} (atualizado)\",\n  \"descricao\": \"Item atualizado via Postman\",\n  \"preco\": {{temp_item_preco_atualizado}},\n  \"consumoLocal\": false,\n  \"caminhoFoto\": \"/imagens/cardapio/{{temp_item_nome}}-novo.jpg\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/itens-cardapio/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "itens-cardapio",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{itemCardapioId}}",
+                      "description": "Identificador único do recurso"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Item de cardápio atualizado com sucesso",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nome\": \"string\",\n  \"preco\": 7572.392977499078,\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": true,\n  \"descricao\": \"string\",\n  \"idRestaurante\": \"6501fafe-f655-8083-bcda-f4b73adca330\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/itens-cardapio/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "itens-cardapio",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071",
+                          "description": "Identificador único do recurso"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": true,\n  \"descricao\": \"string\",\n  \"id\": \"087f5c7c-10a5-5cd9-df6c-0be81f92a29a\",\n  \"idRestaurante\": \"c63d0ea7-e29e-68e8-630b-e129dc4f0af1\",\n  \"nome\": \"string\",\n  \"preco\": 9965.445663069937,\n  \"dataUltimaAlteracao\": \"1991-05-12T21:26:15.730Z\"\n}"
+                },
+                {
+                  "name": "Item de cardápio não encontrado.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nome\": \"string\",\n  \"preco\": 3525.800589918857,\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": false,\n  \"descricao\": \"string\",\n  \"idRestaurante\": \"6501fafe-f655-8083-bcda-f4b73adca330\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/itens-cardapio/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "itens-cardapio",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "b6e49e68-92c8-3978-25fd-8b6cdbb6c5e5",
+                          "description": "Identificador único do recurso"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "Text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Busca itens de cardápio pelo nome",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "const lista = pm.response.json();\r",
+                  "pm.test(\"Resposta é array\", () => pm.expect(lista).to.be.an('array'));\r",
+                  "\r",
+                  "pm.test(\"Retorna itens contendo o termo\", function () {\r",
+                  "    const termo = (pm.collectionVariables.get(\"temp_item_nome_busca\") || \"\").toLowerCase();\r",
+                  "    const found = lista.some(i => (i.nome || \"\").toLowerCase().includes(termo));\r",
+                  "    pm.expect(found, `Nenhum item contém o termo '${termo}'`).to.be.true;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Item criado está entre os resultados (se houver)\", function () {\r",
+                  "    const id = pm.collectionVariables.get(\"itemCardapioId\");\r",
+                  "    if (id) {\r",
+                  "        const found = lista.find(i => i.id === id);\r",
+                  "        pm.expect(found, \"Item criado não está no resultado da busca global\").to.not.be.undefined;\r",
+                  "    }\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/itens-cardapio?nome={{temp_item_rest_nome}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "itens-cardapio"
+              ],
+              "query": [
+                {
+                  "key": "nome",
+                  "value": "{{temp_item_rest_nome}}",
+                  "description": "Termo (case-insensitive) para buscar itens por nome (busca parcial)"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Lista de itens retornada com sucesso",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/itens-cardapio?nome=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "itens-cardapio"
+                  ],
+                  "query": [
+                    {
+                      "description": "Termo (case-insensitive) para buscar itens por nome (busca parcial)",
+                      "key": "nome",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"caminhoFoto\": \"string\",\n    \"consumoLocal\": true,\n    \"descricao\": \"string\",\n    \"id\": \"a27407e9-c871-2249-afcb-ec5f49f0eebe\",\n    \"idRestaurante\": \"8e58d1f4-ff50-14b3-2f50-ceec2a0f5bc9\",\n    \"nome\": \"string\",\n    \"preco\": 2408.3010175209506,\n    \"dataUltimaAlteracao\": \"1948-09-29T06:37:31.960Z\"\n  },\n  {\n    \"caminhoFoto\": \"string\",\n    \"consumoLocal\": false,\n    \"descricao\": \"string\",\n    \"id\": \"8a83b018-f496-01e4-7c4a-305228ed8aca\",\n    \"idRestaurante\": \"6190262e-5bd7-d1f8-e32d-26aa47c85d7c\",\n    \"nome\": \"string\",\n    \"preco\": 603.9150876368127,\n    \"dataUltimaAlteracao\": \"1978-10-10T12:32:05.129Z\"\n  }\n]"
+            },
+            {
+              "name": "Nenhum item encontrado",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/itens-cardapio?nome=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "itens-cardapio"
+                  ],
+                  "query": [
+                    {
+                      "description": "Termo (case-insensitive) para buscar itens por nome (busca parcial)",
+                      "key": "nome",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "restaurantes",
+      "item": [
+        {
+          "name": "{id}",
+          "item": [
+            {
+              "name": "itens-cardapio",
+              "item": [
+                {
+                  "name": "Retorna itens de cardápio do restaurante (com filtro opcional por nome)",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/restaurantes/:id/itens-cardapio?term={{temp_item_nome}} (atualizado)",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "restaurantes",
+                        ":id",
+                        "itens-cardapio"
+                      ],
+                      "query": [
+                        {
+                          "key": "term",
+                          "value": "{{temp_item_nome}} (atualizado)",
+                          "description": "Termo de busca (case-insensitive). Suporta espaços e acentos (URL-encoded)."
+                        }
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "{{restauranteId}}"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Itens de cardápio do restaurante retornados com sucesso",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/restaurantes/:id/itens-cardapio?term=string",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "restaurantes",
+                            ":id",
+                            "itens-cardapio"
+                          ],
+                          "query": [
+                            {
+                              "description": "Termo de busca (case-insensitive). Suporta espaços e acentos (URL-encoded).",
+                              "key": "term",
+                              "value": "string"
+                            }
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "b6e49e68-92c8-3978-25fd-8b6cdbb6c5e5"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "[\n  {\n    \"caminhoFoto\": \"string\",\n    \"consumoLocal\": true,\n    \"descricao\": \"string\",\n    \"id\": \"a27407e9-c871-2249-afcb-ec5f49f0eebe\",\n    \"idRestaurante\": \"8e58d1f4-ff50-14b3-2f50-ceec2a0f5bc9\",\n    \"nome\": \"string\",\n    \"preco\": 2408.3010175209506,\n    \"dataUltimaAlteracao\": \"1948-09-29T06:37:31.960Z\"\n  },\n  {\n    \"caminhoFoto\": \"string\",\n    \"consumoLocal\": false,\n    \"descricao\": \"string\",\n    \"id\": \"8a83b018-f496-01e4-7c4a-305228ed8aca\",\n    \"idRestaurante\": \"6190262e-5bd7-d1f8-e32d-26aa47c85d7c\",\n    \"nome\": \"string\",\n    \"preco\": 603.9150876368127,\n    \"dataUltimaAlteracao\": \"1978-10-10T12:32:05.129Z\"\n  }\n]"
+                    },
+                    {
+                      "name": "Nenhum item encontrado",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                          "raw": "{{baseUrl}}/restaurantes/:id/itens-cardapio?term=string",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "restaurantes",
+                            ":id",
+                            "itens-cardapio"
+                          ],
+                          "query": [
+                            {
+                              "description": "Termo de busca (case-insensitive). Suporta espaços e acentos (URL-encoded).",
+                              "key": "term",
+                              "value": "string"
+                            }
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "b6e49e68-92c8-3978-25fd-8b6cdbb6c5e5"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "No Content",
+                      "code": 204,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": null
+                    }
+                  ]
+                },
+                {
+                  "name": "Cria item de cardápio",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "\r",
+                          "\r",
+                          "// 1. 201 Created\r",
+                          "pm.test(\"Status code é 201 (Created)\", function () {\r",
+                          "    pm.response.to.have.status(201);\r",
+                          "});\r",
+                          "\r",
+                          "const res = pm.response.json();\r",
+                          "\r",
+                          "// 2. Guarda ID do item para GET/PUT/DELETE\r",
+                          "pm.collectionVariables.set(\"itemCardapioId\", res.id);\r",
+                          "\r",
+                          "// 3. Valida estrutura básica\r",
+                          "pm.test(\"Resposta possui estrutura do item de cardápio\", function () {\r",
+                          "    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\r",
+                          "    pm.expect(res).to.have.property('id');\r",
+                          "    pm.expect(res.id).to.match(uuidRegex);\r",
+                          "    pm.expect(res).to.have.property('nome', pm.collectionVariables.get(\"temp_item_rest_nome\"));\r",
+                          "    pm.expect(res).to.have.property('preco', pm.collectionVariables.get(\"temp_item_rest_preco\"));\r",
+                          "    pm.expect(res).to.have.property('consumoLocal', false);\r",
+                          "    pm.expect(res).to.have.property('restauranteId', pm.collectionVariables.get(\"restauranteId\"));\r",
+                          "});\r",
+                          "\r",
+                          "// 4. Preço com 2 casas\r",
+                          "// pm.test(\"Preço possui 2 casas decimais\", function () {\r",
+                          "//     const preco = res.preco;\r",
+                          "//     const twoDecimalRegex = /^\\d+(\\.\\d{2})$/;\r",
+                          "//     pm.expect(String(preco)).to.match(twoDecimalRegex);\r",
+                          "// });\r",
+                          ""
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    },
+                    {
+                      "listen": "prerequest",
+                      "script": {
+                        "exec": [
+                          "const suffix = Date.now();\r",
+                          "pm.collectionVariables.set(\"temp_item_rest_nome\", `Tofu grelhado ${suffix}`);\r",
+                          "pm.collectionVariables.set(\"temp_item_rest_preco\", 25.91);\r",
+                          ""
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nome\": \"{{temp_item_rest_nome}}\",\n  \"preco\": {{temp_item_rest_preco}},\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": false,\n  \"descricao\": \"string\",\n  \"idRestaurante\": \"6501fafe-f655-8083-bcda-f4b73adca330\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/restaurantes/:id/itens-cardapio",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "restaurantes",
+                        ":id",
+                        "itens-cardapio"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "{{restauranteId}}"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Itens de cardápio criado com com sucesso",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"nome\": \"string\",\n  \"preco\": 3525.800589918857,\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": false,\n  \"descricao\": \"string\",\n  \"idRestaurante\": \"6501fafe-f655-8083-bcda-f4b73adca330\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/restaurantes/:id/itens-cardapio",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "restaurantes",
+                            ":id",
+                            "itens-cardapio"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "b6e49e68-92c8-3978-25fd-8b6cdbb6c5e5"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Created",
+                      "code": 201,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"caminhoFoto\": \"string\",\n  \"consumoLocal\": true,\n  \"descricao\": \"string\",\n  \"id\": \"087f5c7c-10a5-5cd9-df6c-0be81f92a29a\",\n  \"idRestaurante\": \"c63d0ea7-e29e-68e8-630b-e129dc4f0af1\",\n  \"nome\": \"string\",\n  \"preco\": 9965.445663069937,\n  \"dataUltimaAlteracao\": \"1991-05-12T21:26:15.730Z\"\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Deleta restaurante por ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test(\"Restaurante removido\", function () {\r",
+                      "    pm.response.to.have.status(204);\r",
+                      "    // Limpeza das variáveis temporárias do restaurante\r",
+                      "    pm.collectionVariables.unset(\"restauranteId\");\r",
+                      "    pm.collectionVariables.unset(\"temp_restaurante_nome\");\r",
+                      "    pm.collectionVariables.unset(\"temp_restaurante_cozinha\");\r",
+                      "    pm.collectionVariables.unset(\"temp_restaurante_endereco\");\r",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{restauranteId}}"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Restaurante deletado com sucesso",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/restaurantes/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "restaurantes",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            },
+            {
+              "name": "Consulta restaurante por ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test(\"Status code é 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Valida estrutura do Restaurante\", function () {\r",
+                      "    const jsonData = pm.response.json();\r",
+                      "    pm.expect(jsonData).to.have.property('id');\r",
+                      "    pm.expect(jsonData).to.have.property('endereco');\r",
+                      "    pm.expect(jsonData).to.have.property('horarioFuncionamento');\r",
+                      "    pm.expect(jsonData).to.have.property('idDono');\r",
+                      "    pm.expect(jsonData).to.have.property('nome');\r",
+                      "    pm.expect(jsonData).to.have.property('tipoCozinha');\r",
+                      "\r",
+                      "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get(\"restauranteId\"));\r",
+                      "    pm.expect(jsonData.endereco).to.eql(pm.collectionVariables.get(\"temp_restaurante_endereco\"));\r",
+                      "    pm.expect(jsonData.nome).to.eql(pm.collectionVariables.get(\"temp_restaurante_nome\"));\r",
+                      "    pm.expect(jsonData.tipoCozinha).to.eql(pm.collectionVariables.get(\"temp_restaurante_cozinha\"));\r",
+                      "    pm.expect(jsonData.idDono).to.eql(pm.collectionVariables.get(\"usuarioId\"));\r",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{restauranteId}}"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Restaurante encontrado",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/restaurantes/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "restaurantes",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"endereco\": \"string\",\n  \"horarioFuncionamento\": \"string\",\n  \"id\": \"d1e627ab-3cca-e93a-e0de-d41e28ba6fa9\",\n  \"idDono\": \"968dcb7f-23fd-1e63-dac9-5ef2e90cabd2\",\n  \"nome\": \"string\",\n  \"tipoCozinha\": \"string\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Atualiza restaurante",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.collectionVariables.set(\"temp_restaurante_nome\", \"Restaurante Atualizado \" + pm.variables.replaceIn('{{$randomInt}}'));\r",
+                      "pm.collectionVariables.set(\"temp_restaurante_endereco\", \"Novo Endereço de Teste, 456\");\r",
+                      "pm.collectionVariables.set(\"temp_restaurante_cozinha\", \"Contemporânea\");"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test(\"Status code é 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Valida estrutura do Restaurante\", function () {\r",
+                      "    const jsonData = pm.response.json();\r",
+                      "    pm.expect(jsonData).to.have.property('id');\r",
+                      "    pm.expect(jsonData).to.have.property('endereco');\r",
+                      "    pm.expect(jsonData).to.have.property('horarioFuncionamento');\r",
+                      "    pm.expect(jsonData).to.have.property('idDono');\r",
+                      "    pm.expect(jsonData).to.have.property('nome');\r",
+                      "    pm.expect(jsonData).to.have.property('tipoCozinha');\r",
+                      "\r",
+                      "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get(\"restauranteId\"));\r",
+                      "    pm.expect(jsonData.endereco).to.eql(pm.collectionVariables.get(\"temp_restaurante_endereco\"));\r",
+                      "    pm.expect(jsonData.nome).to.eql(pm.collectionVariables.get(\"temp_restaurante_nome\"));\r",
+                      "    pm.expect(jsonData.tipoCozinha).to.eql(pm.collectionVariables.get(\"temp_restaurante_cozinha\"));\r",
+                      "    pm.expect(jsonData.idDono).to.eql(pm.collectionVariables.get(\"usuarioId\"));\r",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nome\": \"{{temp_restaurante_nome}}\",\n  \"endereco\": \"{{temp_restaurante_endereco}}\",\n  \"idDono\": \"{{usuarioId}}\",\n  \"horarioFuncionamento\": \"11:00 - 23:00\",\n  \"tipoCozinha\": \"{{temp_restaurante_cozinha}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{restauranteId}}",
+                      "description": "ID único do usuário (UUID)"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Usuário atualizado com sucesso.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nome\": \"string\",\n  \"endereco\": \"string\",\n  \"idDono\": \"f16c7000-667f-3a5e-a403-1841e8a5a5ae\",\n  \"horarioFuncionamento\": \"string\",\n  \"tipoCozinha\": \"string\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/restaurantes/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "restaurantes",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071",
+                          "description": "ID único do usuário (UUID)"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"endereco\": \"string\",\n  \"horarioFuncionamento\": \"string\",\n  \"id\": \"68ea4cae-8937-cfbe-3686-2b8c865dd335\",\n  \"idDono\": \"a51cb303-1c31-b622-0a28-746f0099f1f1\",\n  \"nome\": \"string\",\n  \"tipoCozinha\": \"string\"\n}"
+                },
+                {
+                  "name": "Restaurante não encontrado.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nome\": \"string\",\n  \"endereco\": \"string\",\n  \"idDono\": \"4452332b-90ea-9979-5ff3-7eb76912a1d0\",\n  \"horarioFuncionamento\": \"string\",\n  \"tipoCozinha\": \"string\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/restaurantes/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "restaurantes",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "9550bc5e-f715-2e5e-5496-3dd9751ac4c3",
+                          "description": "ID único do usuário (UUID)"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "Text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lista restaurantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test(\"Status 200 e Lista retornada\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "    pm.expect(pm.response.json()).to.be.an('array');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O restaurante criado está na lista\", function () {\r",
+                  "    const list = pm.response.json();\r",
+                  "    const createdId = pm.collectionVariables.get(\"restauranteId\");\r",
+                  "    const found = list.find(r => r.id === createdId);\r",
+                  "    pm.expect(found).to.not.be.undefined;\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/restaurantes?nome={{temp_restaurante_nome}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "restaurantes"
+              ],
+              "query": [
+                {
+                  "description": "Nome do restaurante a ser buscado",
+                  "key": "nome",
+                  "value": "{{temp_restaurante_nome}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Lista retornada",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes?nome=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes"
+                  ],
+                  "query": [
+                    {
+                      "description": "Nome do restaurante a ser buscado",
+                      "key": "nome",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"endereco\": \"string\",\n    \"horarioFuncionamento\": \"string\",\n    \"id\": \"e429a859-e772-432e-e0bd-dce0c3947085\",\n    \"idDono\": \"feae7b83-0851-1ef4-2e9f-95e1985a1eac\",\n    \"nome\": \"string\",\n    \"tipoCozinha\": \"string\"\n  },\n  {\n    \"endereco\": \"string\",\n    \"horarioFuncionamento\": \"string\",\n    \"id\": \"f07b471f-caf8-0b73-2f82-2369591c5c7f\",\n    \"idDono\": \"a9b03bc0-b7a0-7577-4b0d-aefe3e1872b9\",\n    \"nome\": \"string\",\n    \"tipoCozinha\": \"string\"\n  }\n]"
+            },
+            {
+              "name": "Restaurante não encontrado com o nome fornecido.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes?nome=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes"
+                  ],
+                  "query": [
+                    {
+                      "description": "Nome do restaurante a ser buscado",
+                      "key": "nome",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": null
+            }
+          ]
+        },
+        {
+          "name": "Cadastra restaurante",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// 1. Gera o Nome do Restaurante (Variável correta: $randomCompanyName)\r",
+                  "const nomeRestaurante = pm.variables.replaceIn('{{$randomCompanyName}} Gourmet');\r",
+                  "\r",
+                  "// 2. Gera o Endereço (Variável correta: $randomStreetAddress)\r",
+                  "const endereco = pm.variables.replaceIn('{{$randomStreetAddress}}, {{$randomCity}}');\r",
+                  "\r",
+                  "// 3. Define o Tipo de Cozinha (Como não há um random nativo para comida, usamos um array fixo)\r",
+                  "const cozinhas = [\"Italiana\", \"Japonesa\", \"Brasileira\", \"Mexicana\", \"Árabe\", \"Vegana\"];\r",
+                  "const tipoCozinha = cozinhas[Math.floor(Math.random() * cozinhas.length)];\r",
+                  "\r",
+                  "// 4. Salva nas variáveis de coleção para usar no Body\r",
+                  "pm.collectionVariables.set(\"temp_restaurante_nome\", nomeRestaurante);\r",
+                  "pm.collectionVariables.set(\"temp_restaurante_endereco\", endereco);\r",
+                  "pm.collectionVariables.set(\"temp_restaurante_cozinha\", tipoCozinha);\r",
+                  "\r",
+                  "// Log para você conferir no Console (Ctrl + Alt + C)\r",
+                  "console.log(\"Restaurante Gerado:\", nomeRestaurante);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Restaurante criado com sucesso\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "    const response = pm.response.json();\r",
+                  "    // Salva o ID para GET, PUT e DELETE\r",
+                  "    pm.collectionVariables.set(\"restauranteId\", response.id);\r",
+                  "    pm.environment.set(\"restaurante_Id\", response.id);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{temp_restaurante_nome}}\",\n  \"endereco\": \"{{temp_restaurante_endereco}}\",\n  \"idDono\": \"{{usuarioId}}\",\n  \"horarioFuncionamento\": \"09:00 - 22:00\",\n  \"tipoCozinha\": \"{{temp_restaurante_cozinha}}\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/restaurantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "restaurantes"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Restaurante criado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nome\": \"string\",\n  \"endereco\": \"string\",\n  \"idDono\": \"f16c7000-667f-3a5e-a403-1841e8a5a5ae\",\n  \"horarioFuncionamento\": \"string\",\n  \"tipoCozinha\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/restaurantes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "restaurantes"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"endereco\": \"string\",\n  \"horarioFuncionamento\": \"string\",\n  \"id\": \"68ea4cae-8937-cfbe-3686-2b8c865dd335\",\n  \"idDono\": \"a51cb303-1c31-b622-0a28-746f0099f1f1\",\n  \"nome\": \"string\",\n  \"tipoCozinha\": \"string\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tipos-usuario",
+      "item": [
+        {
+          "name": "{id}",
+          "item": [
+            {
+              "name": "Remove tipo de usuário",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test(\"Excluído com sucesso\", function () {\r",
+                      "    pm.response.to.have.status(204);\r",
+                      "    pm.collectionVariables.unset(\"tipoUsuarioId\"); // Remove a variável\r",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/tipos-usuario/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tipos-usuario",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{tipoUsuarioId}}",
+                      "description": "Identificador único do recurso"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Removido com sucesso",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/tipos-usuario/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "tipos-usuario",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071",
+                          "description": "Identificador único do recurso"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            },
+            {
+              "name": "Consulta tipo de usuário por ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test(\"Status code é 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Valida estrutura do TipoUsuarioResponse\", function () {\r",
+                      "    const jsonData = pm.response.json();\r",
+                      "    pm.expect(jsonData).to.have.property('id');\r",
+                      "    pm.expect(jsonData).to.have.property('nome');\r",
+                      "    pm.expect(jsonData).to.have.property('categoriaUsuario');\r",
+                      "\r",
+                      "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get(\"tipoUsuarioId\"));\r",
+                      "    pm.expect(jsonData.categoriaUsuario).to.eql(pm.collectionVariables.get(\"temp_categoria_tipo\"));\r",
+                      "    pm.expect(jsonData.nome).to.eql(pm.collectionVariables.get(\"temp_nome_tipo\"));\r",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/tipos-usuario/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tipos-usuario",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{tipoUsuarioId}}",
+                      "description": "Identificador único do recurso"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Tipo encontrado",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/tipos-usuario/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "tipos-usuario",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071",
+                          "description": "Identificador único do recurso"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"categoriaUsuario\": \"string\",\n  \"nome\": \"string\",\n  \"id\": \"9bc66b03-80cb-5b7c-c7d9-0ee98add88f7\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Atualiza tipo de usuário",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test(\"Status code é 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Valida estrutura do TipoUsuarioResponse\", function () {\r",
+                      "    const jsonData = pm.response.json();\r",
+                      "    pm.expect(jsonData).to.have.property('id');\r",
+                      "    pm.expect(jsonData).to.have.property('nome');\r",
+                      "    pm.expect(jsonData).to.have.property('categoriaUsuario');\r",
+                      "\r",
+                      "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get(\"tipoUsuarioId\"));\r",
+                      "    pm.expect(jsonData.categoriaUsuario).to.eql(pm.collectionVariables.get(\"temp_categoria_tipo\"));\r",
+                      "    pm.expect(jsonData.nome).to.eql(pm.collectionVariables.get(\"temp_nome_tipo\"));\r",
+                      "});"
+                    ]
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "const randomName = \"Tipo Atualizado \" + pm.collectionVariables.get(\"temp_nome_tipo\");\r",
+                      "pm.collectionVariables.set(\"temp_nome_tipo\", randomName);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"categoriaUsuario\": \"{{temp_categoria_tipo}}\",\n  \"nome\": \"{{temp_nome_tipo}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/tipos-usuario/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tipos-usuario",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{tipoUsuarioId}}",
+                      "description": "Identificador único do recurso"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Atualizado com sucesso",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"categoriaUsuario\": \"CLIENTE\",\n  \"nome\": \"string\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/tipos-usuario/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "tipos-usuario",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "e34baa46-9a6a-e1f1-c312-411fb09e0071",
+                          "description": "Identificador único do recurso"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"categoriaUsuario\": \"string\",\n  \"nome\": \"string\",\n  \"id\": \"9bc66b03-80cb-5b7c-c7d9-0ee98add88f7\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lista os tipos de usuário",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// 1. Valida se o status code é 200 (OK)\r",
+                  "pm.test(\"Status code é 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// 2. Valida se a resposta é um array\r",
+                  "pm.test(\"A resposta deve ser uma lista (array)\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an('array');\r",
+                  "});\r",
+                  "\r",
+                  "// 3. Valida a estrutura de cada item da lista\r",
+                  "pm.test(\"Cada item da lista possui os campos obrigatórios\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    \r",
+                  "    // Verifica apenas se a lista não estiver vazia\r",
+                  "    if (jsonData.length > 0) {\r",
+                  "        jsonData.forEach((tipo) => {\r",
+                  "            pm.expect(tipo).to.have.property('id');\r",
+                  "            pm.expect(tipo).to.have.property('nome');\r",
+                  "            pm.expect(tipo).to.have.property('categoriaUsuario');\r",
+                  "            \r",
+                  "            // Valida se o ID tem formato de UUID (conforme o OpenAPI)\r",
+                  "            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\r",
+                  "            pm.expect(tipo.id).to.match(uuidRegex);\r",
+                  "        });\r",
+                  "    }\r",
+                  "});\r",
+                  "\r",
+                  "// 4. Validação de Integração: O item que criamos no POST anterior aparece na lista?\r",
+                  "pm.test(\"O ID criado anteriormente está presente na listagem\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    const idCriado = pm.collectionVariables.get(\"tipoUsuarioId\");\r",
+                  "    \r",
+                  "    if (idCriado) {\r",
+                  "        const itemEncontrado = jsonData.find(item => item.id === idCriado);\r",
+                  "        pm.expect(itemEncontrado).to.not.be.undefined;\r",
+                  "        console.log(\"Sucesso: O ID \" + idCriado + \" foi encontrado na lista.\");\r",
+                  "    }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tipos-usuario",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tipos-usuario"
+              ]
+            },
+            "description": "Retorna todos os tipos de usuário cadastrados."
+          },
+          "response": [
+            {
+              "name": "Lista de tipos retornada com sucesso",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/tipos-usuario",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tipos-usuario"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"categoriaUsuario\": \"string\",\n    \"nome\": \"string\",\n    \"id\": \"52fb3831-9c66-4093-231b-7a4faa25e39b\"\n  },\n  {\n    \"categoriaUsuario\": \"string\",\n    \"nome\": \"string\",\n    \"id\": \"d6fce429-4892-ec2b-15ee-ce58034a2955\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Cadastra novo tipo de usuário",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Gera um nome aleatório para o tipo de usuário\r",
+                  "const randomName = \"Tipo \" + pm.variables.replaceIn('{{$randomJobTitle}}');\r",
+                  "pm.collectionVariables.set(\"temp_nome_tipo\", randomName);\r",
+                  "\r",
+                  "// Define uma categoria aleatória baseada no Enum do seu OpenAPI\r",
+                  "const categorias = [\"CLIENTE\", \"DONO_RESTAURANTE\", \"ADMIN\"];\r",
+                  "const randomCategoria = categorias[Math.floor(Math.random() * categorias.length)];\r",
+                  "pm.collectionVariables.set(\"temp_categoria_tipo\", randomCategoria);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test(\"Status code é 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "const response = pm.response.json();\r",
+                  "if (response.id) {\r",
+                  "    pm.collectionVariables.set(\"tipoUsuarioId\", response.id);\r",
+                  "    console.log(\"ID capturado: \" + response.id);\r",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoriaUsuario\": \"{{temp_categoria_tipo}}\",\n  \"nome\": \"{{temp_nome_tipo}}\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tipos-usuario",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tipos-usuario"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Tipo criado com sucesso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"categoriaUsuario\": \"CLIENTE\",\n  \"nome\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/tipos-usuario",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tipos-usuario"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"categoriaUsuario\": \"string\",\n  \"nome\": \"string\",\n  \"id\": \"9bc66b03-80cb-5b7c-c7d9-0ee98add88f7\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "usuarios",
+      "item": [
+        {
+          "name": "{id}",
+          "item": [
+            {
+              "name": "senha",
+              "item": [
+                {
+                  "name": "Altera a senha de um usuário específico",
+                  "event": [
+                    {
+                      "listen": "prerequest",
+                      "script": {
+                        "type": "text/javascript",
+                        "packages": {},
+                        "exec": [
+                          ""
+                        ]
+                      }
+                    },
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "packages": {},
+                        "exec": [
+                          "pm.collectionVariables.set(\"temp_usuario_senha\", \"novaSenha123!\");\r",
+                          "\r",
+                          "pm.test(\"Senha atualizada com sucesso\", function () {\r",
+                          "    pm.response.to.have.status(204);\r",
+                          "});"
+                        ]
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"senhaAtual\": \"{{temp_usuario_senha}}\",\n  \"novaSenha\": \"novaSenha123!\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id/senha",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id",
+                        "senha"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "{{usuarioId}}",
+                          "description": "ID do usuário (UUID)"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Senha alterada com sucesso",
+                      "originalRequest": {
+                        "method": "PATCH",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"senhaAtual\": \"secret123\",\n  \"novaSenha\": \"novaSenha456\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/usuarios/:id/senha",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "usuarios",
+                            ":id",
+                            "senha"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "f26a081d-8738-1321-3e5a-6fbc928027d6",
+                              "description": "ID do usuário (UUID)"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "No Content",
+                      "code": 204,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": null
+                    },
+                    {
+                      "name": "Dados inválidos ou senha incorreta",
+                      "originalRequest": {
+                        "method": "PATCH",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"senhaAtual\": \"secret123\",\n  \"novaSenha\": \"novaSenha456\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/usuarios/:id/senha",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "usuarios",
+                            ":id",
+                            "senha"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "f26a081d-8738-1321-3e5a-6fbc928027d6",
+                              "description": "ID do usuário (UUID)"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Bad Request",
+                      "code": 400,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": null
+                    },
+                    {
+                      "name": "Usuário não encontrado",
+                      "originalRequest": {
+                        "method": "PATCH",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"senhaAtual\": \"secret123\",\n  \"novaSenha\": \"novaSenha456\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/usuarios/:id/senha",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "usuarios",
+                            ":id",
+                            "senha"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "f26a081d-8738-1321-3e5a-6fbc928027d6",
+                              "description": "ID do usuário (UUID)"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Not Found",
+                      "code": 404,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": null
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Deleta usuário por ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test(\"Usuário removido\", function () {\r",
+                      "    pm.response.to.have.status(204);\r",
+                      "    // Limpeza de variáveis\r",
+                      "    pm.collectionVariables.unset(\"usuarioId\");\r",
+                      "    pm.collectionVariables.unset(\"temp_usuario_nome\");\r",
+                      "    pm.collectionVariables.unset(\"temp_usuario_login\");\r",
+                      "    pm.collectionVariables.unset(\"temp_usuario_email\");\r",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{usuarioId}}"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Usuário deletado com sucesso",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "f26a081d-8738-1321-3e5a-6fbc928027d6"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            },
+            {
+              "name": "Busca usuário por ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code é 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Busca por id retornou o usuário correto\", function () {\r",
+                      "    const response = pm.response.json();\r",
+                      "    pm.expect(response.id).to.eql(pm.collectionVariables.get(\"usuarioId\"))\r",
+                      "    pm.expect(response.nome).to.eql(pm.collectionVariables.get(\"temp_usuario_nome\"));\r",
+                      "    pm.expect(response.tipo.id).to.eql(pm.collectionVariables.get(\"tipoUsuarioId\"))\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.log(\"Token: \" + pm.collectionVariables.get(\"accessToken\"));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZWNoLWNoYWxsZW5nZS1hdXRoIiwic3ViIjoiZTAyZDg5OWEtZjM2Ny00NjgzLTk5MjktNmMwMTdmYzFkMTk4IiwibG9naW4iOiJ1c2VyXzQ0NyIsInJvbGVzIjpbIlJPTEVfRE9OT19SRVNUQVVSQU5URSJdLCJpYXQiOjE3NzM3MTg4MjksImV4cCI6MTc3MzcyMjQyOX0.PryPWX0vcV9nOZ1bGzOcoIm8yGX2QqZlmDiI9RZF0sk",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{usuarioId}}"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Usuário encontrado",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "f26a081d-8738-1321-3e5a-6fbc928027d6"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"dd02666a-992f-3fd5-4658-7a9f4e97684e\",\n  \"nome\": \"string\",\n  \"email\": \"string\",\n  \"login\": \"string\",\n  \"tipo\": {\n    \"id\": \"679a36bc-318a-a678-8cb9-8338cb3a82d7\",\n    \"nome\": \"string\",\n    \"categoriaUsuario\": \"string\"\n  },\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"string\",\n    \"cidade\": \"Barbacena\",\n    \"cep\": \"36200-000\",\n    \"uf\": \"MG\"\n  },\n  \"dataUltimaAlteracao\": \"1994-01-05T03:57:36.329Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Atualiza um usuário existente",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test(\"Usuário ATUALIZADO com sucesso\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "    const response = pm.response.json();\r",
+                      "    pm.collectionVariables.set(\"usuarioId\", response.id);\r",
+                      "});"
+                    ]
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.collectionVariables.set(\"temp_usuario_nome\", pm.collectionVariables.get(\"temp_usuario_nome\") + \" EDITADO\");\r",
+                      "pm.collectionVariables.set(\"temp_usuario_login\", pm.collectionVariables.get(\"temp_usuario_login\") + \"EDITADO\");\r",
+                      "pm.collectionVariables.set(\"temp_usuario_email\",  \"editado\" + pm.collectionVariables.get(\"temp_usuario_email\"));\r",
+                      ""
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nome\": \"{{temp_usuario_nome}}\",\n  \"email\": \"{{temp_usuario_email}}\",\n  \"login\": \"{{temp_usuario_login}}\",\n  \"tipo\": \"{{tipoUsuarioId}}\",\n  \"endereco\": {\n    \"rua\": \"Nova Rua\",\n    \"numero\": \"999\",\n    \"cidade\": \"Maringá\",\n    \"cep\": \"87000-000\",\n    \"uf\": \"PR\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{usuarioId}}",
+                      "description": "ID único do usuário (UUID)"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Usuário atualizado com sucesso.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nome\": \"string\",\n  \"email\": \"PxizlyA@uUMGNcLrgwSGMwmPrxAlvLWmdKveh.qz\",\n  \"login\": \"string\",\n  \"tipo\": \"01fb3b79-c1f3-0da7-a054-766ac720c1a8\",\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"string\",\n    \"cidade\": \"Barbacena\",\n    \"cep\": \"36200-000\",\n    \"uf\": \"MG\"\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "f26a081d-8738-1321-3e5a-6fbc928027d6",
+                          "description": "ID único do usuário (UUID)"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"dd02666a-992f-3fd5-4658-7a9f4e97684e\",\n  \"nome\": \"string\",\n  \"email\": \"string\",\n  \"login\": \"string\",\n  \"tipo\": {\n    \"id\": \"679a36bc-318a-a678-8cb9-8338cb3a82d7\",\n    \"nome\": \"string\",\n    \"categoriaUsuario\": \"string\"\n  },\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"string\",\n    \"cidade\": \"Barbacena\",\n    \"cep\": \"36200-000\",\n    \"uf\": \"MG\"\n  },\n  \"dataUltimaAlteracao\": \"1994-01-05T03:57:36.329Z\"\n}"
+                },
+                {
+                  "name": "Usuário não encontrado.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nome\": \"string\",\n  \"email\": \"PxizlyA@uUMGNcLrgwSGMwmPrxAlvLWmdKveh.qz\",\n  \"login\": \"string\",\n  \"tipo\": \"01fb3b79-c1f3-0da7-a054-766ac720c1a8\",\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"string\",\n    \"cidade\": \"Barbacena\",\n    \"cep\": \"36200-000\",\n    \"uf\": \"MG\"\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "f26a081d-8738-1321-3e5a-6fbc928027d6",
+                          "description": "ID único do usuário (UUID)"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "auth",
+          "item": [
+            {
+              "name": "Auth",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "// 1. Valida se o status da resposta é 200 OK",
+                      "pm.test(\"Status code é 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "// Converte a resposta recebida para um objeto JSON",
+                      "var jsonData = pm.response.json();",
+                      "",
+                      "// 2. Valida se a resposta contém os campos esperados",
+                      "pm.test(\"Resposta contém o token e os campos corretos\", function () {",
+                      "    pm.expect(jsonData).to.have.property(\"token\");",
+                      "    pm.expect(jsonData).to.have.property(\"tipo\", \"Bearer\");",
+                      "});",
+                      "",
+                      "// 3. Salva o accessToken em uma variável para ser usada depois",
+                      "if (jsonData.token) {",
+                      "    // Salva como Variável de Ambiente (recomendado se você usa Environments no Postman)",
+                      "    pm.environment.set(\"token\", jsonData.token);",
+                      "",
+                      "    // Salva também como Variável de Coleção (útil para execução em Collection Runner)",
+                      "    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+                      "",
+                      "    // Log opcional para debug",
+                      "    console.log(\"Token salvo com sucesso: \" + jsonData.accessToken);",
+                      "}",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"email\": \"{{temp_usuario_email}}\",\r\n  \"senha\": \"{{temp_usuario_senha}}\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Busca um usuário por nome",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test(\"Busca por nome retornou o usuário correto\", function () {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response.id).to.eql(pm.collectionVariables.get(\"usuarioId\"))\r",
+                  "    pm.expect(response.nome).to.eql(pm.collectionVariables.get(\"temp_usuario_nome\"));\r",
+                  "    pm.expect(response.tipo.id).to.eql(pm.collectionVariables.get(\"tipoUsuarioId\"))\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios?nome={{temp_usuario_nome}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "description": "Nome do usuário a ser buscado",
+                  "key": "nome",
+                  "value": "{{temp_usuario_nome}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Usuário encontrado",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios?nome=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios"
+                  ],
+                  "query": [
+                    {
+                      "description": "Nome do usuário a ser buscado",
+                      "key": "nome",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"dd02666a-992f-3fd5-4658-7a9f4e97684e\",\n  \"nome\": \"string\",\n  \"email\": \"string\",\n  \"login\": \"string\",\n  \"tipo\": {\n    \"id\": \"679a36bc-318a-a678-8cb9-8338cb3a82d7\",\n    \"nome\": \"string\",\n    \"categoriaUsuario\": \"string\"\n  },\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"string\",\n    \"cidade\": \"Barbacena\",\n    \"cep\": \"36200-000\",\n    \"uf\": \"MG\"\n  },\n  \"dataUltimaAlteracao\": \"1994-01-05T03:57:36.329Z\"\n}"
+            },
+            {
+              "name": "Usuário não encontrado com o nome fornecido.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios?nome=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios"
+                  ],
+                  "query": [
+                    {
+                      "description": "Nome do usuário a ser buscado",
+                      "key": "nome",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": null
+            }
+          ]
+        },
+        {
+          "name": "Cadastra um novo usuário",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Gera dados aleatórios para o usuário\r",
+                  "const randomNum = pm.variables.replaceIn('{{$randomInt}}');\r",
+                  "const nome = pm.variables.replaceIn('{{$randomFullName}}');\r",
+                  "const login = \"user_\" + randomNum;\r",
+                  "const email = \"teste\" + randomNum + \"@exemplo.com\";\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"temp_usuario_nome\", nome);\r",
+                  "pm.collectionVariables.set(\"temp_usuario_login\", login);\r",
+                  "pm.collectionVariables.set(\"temp_usuario_email\", email);\r",
+                  "pm.collectionVariables.set(\"temp_usuario_senha\", \"SenhaSegura123!\");\r",
+                  "\r",
+                  "console.log(\"usuario login: \" + login);\r",
+                  "console.log(\"usuario senha: SenhaSegura123!\");\r",
+                  "\r",
+                  "// O tipoUsuarioId deve vir do CRUD anterior\r",
+                  "// Se não existir, definimos um valor fixo para não quebrar o teste\r",
+                  "if (!pm.collectionVariables.get(\"tipoUsuarioId\")) {\r",
+                  "    console.warn(\"tipoUsuarioId não encontrado! Certifique-se de rodar o CRUD de Tipos primeiro.\");\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Usuário criado com sucesso\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"usuarioId\", response.id);\r",
+                  "    pm.environment.set(\"usuario_Id\", response.id);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{temp_usuario_nome}}\",\n  \"email\": \"{{temp_usuario_email}}\",\n  \"login\": \"{{temp_usuario_login}}\",\n  \"senha\": \"{{temp_usuario_senha}}\",\n  \"tipo\": \"{{tipoUsuarioId}}\",\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"cidade\": \"Maringá\",\n    \"cep\": \"87000-000\",\n    \"uf\": \"PR\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Usuário criado com sucesso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nome\": \"John Doe\",\n  \"email\": \"johndoe@example.com\",\n  \"login\": \"johndoe\",\n  \"senha\": \"secret123\",\n  \"tipo\": \"260b5e3d-dc21-4d05-a7fd-15e3dd5710e6\",\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"string\",\n    \"cidade\": \"Barbacena\",\n    \"cep\": \"36200-000\",\n    \"uf\": \"MG\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"dd02666a-992f-3fd5-4658-7a9f4e97684e\",\n  \"nome\": \"string\",\n  \"email\": \"string\",\n  \"login\": \"string\",\n  \"tipo\": {\n    \"id\": \"679a36bc-318a-a678-8cb9-8338cb3a82d7\",\n    \"nome\": \"string\",\n    \"categoriaUsuario\": \"string\"\n  },\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"string\",\n    \"cidade\": \"Barbacena\",\n    \"cep\": \"36200-000\",\n    \"uf\": \"MG\"\n  },\n  \"dataUltimaAlteracao\": \"1994-01-05T03:57:36.329Z\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "temp_nome_tipo",
+      "value": ""
+    },
+    {
+      "key": "temp_categoria_tipo",
+      "value": ""
+    },
+    {
+      "key": "tipoUsuarioId",
+      "value": ""
+    },
+    {
+      "key": "temp_usuario_nome",
+      "value": ""
+    },
+    {
+      "key": "temp_usuario_login",
+      "value": ""
+    },
+    {
+      "key": "temp_usuario_email",
+      "value": ""
+    },
+    {
+      "key": "temp_usuario_senha",
+      "value": ""
+    },
+    {
+      "key": "usuarioId",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "temp_restaurante_nome",
+      "value": ""
+    },
+    {
+      "key": "temp_restaurante_endereco",
+      "value": ""
+    },
+    {
+      "key": "temp_restaurante_cozinha",
+      "value": ""
+    },
+    {
+      "key": "restauranteId",
+      "value": ""
+    },
+    {
+      "key": "temp_item_nome",
+      "value": ""
+    },
+    {
+      "key": "temp_item_preco",
+      "value": ""
+    },
+    {
+      "key": "itemCardapioId",
+      "value": ""
+    },
+    {
+      "key": "temp_item_preco_atualizado",
+      "value": ""
+    },
+    {
+      "key": "temp_item_rest_nome",
+      "value": ""
+    },
+    {
+      "key": "temp_item_rest_preco",
+      "value": ""
+    },
+    {
+      "key": "temp_item_nome_busca",
+      "value": ""
+    }
+  ]
+}

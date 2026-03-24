@@ -1,0 +1,55 @@
+{
+  "info": {
+    "_postman_id": "d6eec7bb-b948-42a7-be9e-01496a011144",
+    "name": "GatewayPagamentoExterno",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12350835",
+    "_collection_link": "https://go.postman.co/collection/12350835-d6eec7bb-b948-42a7-be9e-01496a011144?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "solicitar-pagamento",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"valor\": 10,\r\n    \"pagamento_id\": \"cc8e19fc-dced-4f6b-ae0f-09a45bdcbeb9\",\r\n    \"cliente_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{gatewayPagamentoUrl}}/requisicao",
+          "host": [
+            "{{gatewayPagamentoUrl}}"
+          ],
+          "path": [
+            "requisicao"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "status-pagamento",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{gatewayPagamentoUrl}}/requisicao/f9e8d7c6-b5a4-3210-9876-543210fedcba",
+          "host": [
+            "{{gatewayPagamentoUrl}}"
+          ],
+          "path": [
+            "requisicao",
+            "f9e8d7c6-b5a4-3210-9876-543210fedcba"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
